@@ -100,7 +100,7 @@ public class TupleDesc implements Serializable {
     	
     	ArrayList<TDItem> TDItemList = new ArrayList<TDItem>();
         for (int i=0; i< typeAr.length; i++){
-        	
+        	// create TDItem element
         	TDItem tditem = new TDItem(typeAr[i], "N/A");
         	
         	TDItemList.add(tditem);
