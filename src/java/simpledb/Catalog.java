@@ -17,12 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Threadsafe
  */
 public class Catalog {
+	
+	ArrayList<Object> cata_list;
 
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
+    	
+    	cata_list = new ArrayList<Object>();
         // some code goes here
     	
     }
