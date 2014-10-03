@@ -21,7 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Catalog {
 	
-	public static class Table {
+	ArrayList<Table> Catalog_list; 
+	
+	private class Table {
 		public DbFile table_file;
 		
 		public TupleDesc myTupleDesc;
@@ -51,7 +53,7 @@ public class Catalog {
 		
 	}
 	
-	ArrayList<Table> Catalog_list; 
+	
     /**
      * Constructor.
      * Creates a new, empty catalog.
@@ -71,11 +73,11 @@ public class Catalog {
      * conflict exists, use the last table to be added as the table for a given name.
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+     
     	
     	Table mytable = new Table(file, name, pkeyField);
     	
-    	Catalog_list.add(mytable);
+    	this.Catalog_list.add(mytable);
     }
 
     public void addTable(DbFile file, String name) {
@@ -98,15 +100,28 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // some code goes here
+    	int id = 0;
+    	if(name == null) 
+        	throw new NoSuchElementException();
+    	
+       
     	for (Table table: Catalog_list)
     	{
-    		if(table.name == name){
-    			return table.tableID;
+    		if(table.name.equals(name)){
+    			 id = table.tableID;
+    			 return id;
+    		
     		}
+    		else id = -1;
+    		
     	}
-        return 0;
+        if (id == -1){
+        	throw new NoSuchElementException();
+        }
+        
+     return id;
     }
+    
 
     /**
      * Returns the tuple descriptor (schema) of the specified table
@@ -154,10 +169,14 @@ public class Catalog {
     }
 
     public Iterator<Integer> tableIdIterator() {
-        // some code goes here
-        return null;
+        ArrayList<Integer> idArr = new ArrayList<Integer>();
+        for (Table table : Catalog_list){
+        	idArr.add(table.tableID);
+        }
+        return idArr.iterator();
     }
 
+    
     public String getTableName(int id) {
 
     	for (Table table: Catalog_list)
