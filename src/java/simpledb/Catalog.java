@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,19 +17,48 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @Threadsafe
  */
+
+
 public class Catalog {
 	
-	ArrayList<Object> cata_list;
+	public static class Table {
+		public DbFile table_file;
+		
+		public TupleDesc myTupleDesc;
 
+		public String name;
+
+		public int tableID;
+
+		public String pkeyField; 
+		
+		public Table(DbFile file_, String name_, String pkeyField_){
+			this.table_file = file_;
+			this.myTupleDesc = table_file.getTupleDesc();  
+			this.name = name_;
+			this.tableID = table_file.getId();
+			if (pkeyField != null){
+				this.pkeyField = pkeyField_;
+			}
+			else {
+				this.pkeyField = "";
+			}
+		}
+		
+		public String toString() {
+		return name + " (" + "Primary Key: " + pkeyField + "; fileID: " + tableID + ")";
+		}
+		
+	}
+	
+	ArrayList<Table> Catalog_list; 
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
     	
-    	cata_list = new ArrayList<Object>();
-        // some code goes here
-    	
+    	Catalog_list = new ArrayList<Table>();
     }
 
     /**
@@ -42,6 +72,10 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // some code goes here
+    	
+    	Table mytable = new Table(file, name, pkeyField);
+    	
+    	Catalog_list.add(mytable);
     }
 
     public void addTable(DbFile file, String name) {
@@ -65,6 +99,12 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
+    	for (Table table: Catalog_list)
+    	{
+    		if(table.name == name){
+    			return table.tableID;
+    		}
+    	}
         return 0;
     }
 
@@ -76,6 +116,12 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // some code goes here
+    	for (Table table: Catalog_list)
+    	{
+    		if(table.tableID == tableid){
+    			return table.myTupleDesc;
+    		}
+    	}
         return null;
     }
 
@@ -86,12 +132,24 @@ public class Catalog {
      *     function passed to addTable
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
-        // some code goes here
+
+    	for (Table table: Catalog_list)
+    	{
+    		if(table.tableID == tableid){
+    			return table.table_file;
+    		}
+    	}
         return null;
     }
 
     public String getPrimaryKey(int tableid) {
-        // some code goes here
+
+    	for (Table table: Catalog_list)
+    	{
+    		if(table.tableID == tableid){
+    			return table.pkeyField;
+    		}
+    	}
         return null;
     }
 
@@ -101,13 +159,23 @@ public class Catalog {
     }
 
     public String getTableName(int id) {
-        // some code goes here
+
+    	for (Table table: Catalog_list)
+    	{
+    		if(table.tableID == id){
+    			return table.name;
+    		}
+    	}
         return null;
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
-        // some code goes here
+
+    	for (Table table: Catalog_list)
+    	{
+    		Catalog_list.remove(table);
+    	}
     }
     
     /**
