@@ -1,7 +1,7 @@
 package simpledb;
 
 import java.io.*;
-
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,7 +24,15 @@ public class BufferPool {
     /** Default number of pages passed to the constructor. This is used by
     other classes. BufferPool should use the numPages argument to the
     constructor instead. */
-    public static final int DEFAULT_PAGES = 50;
+    //the static and final had to be taken off so num_Pages could be assigned 
+    // to DEFAULT_PAGES in the constructor
+    public static int DEFAULT_PAGES = 50;
+    
+    //where it stores it's page
+    //I really wanted to use BoundedFifoBuffer but I barely know java
+    //and all that library packaging and java jargon was too complicated
+    //sooo... yeah
+    public ArrayList<Page> bufferPoolStorage;
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -33,6 +41,8 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
+    	BufferPool.DEFAULT_PAGES = numPages;
+    	this.bufferPoolStorage = new ArrayList<Page>(DEFAULT_PAGES);
     }
     
     public static int getPageSize() {
@@ -62,6 +72,17 @@ public class BufferPool {
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
         // some code goes here
+    	boolean page_found = false;
+    	for (Page page: bufferPoolStorage){
+    		if(page.getId().equals(pid)){
+    			page_found = true;
+    			return page;
+    		}
+    	}
+    	if (page_found == false){
+    		//read page from DbFile using pageId
+    		
+    	}
         return null;
     }
 
