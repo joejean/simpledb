@@ -265,7 +265,7 @@ public class TupleDesc implements Serializable {
     			return false;
     		}
     	}
-        
+        //if everything goes well this should return true.
         return !(iter1.hasNext() || iter2.hasNext());
     }
 

@@ -66,7 +66,7 @@ public class HeapPage implements Page {
         @return the number of tuples on this page
     */
     private int getNumTuples() {        
-        int tupleSize = Database.getCatalog().getTupleDesc(this.pid.getTableId()).getSize();
+        int tupleSize = td.getSize();
         return  (int) Math.floor((BufferPool.getPageSize()*8) / (tupleSize * 8 + 1));
 
     }
@@ -77,8 +77,13 @@ public class HeapPage implements Page {
      */
     private int getHeaderSize() {  
     	
-        return (int) Math.ceil(this.numSlots / 8);
-                 
+    	int numTuples = getNumTuples();
+    	
+    	int headerBytes = (numTuples / 8);
+    	if (headerBytes * 8 < numTuples) 
+    		headerBytes++;
+    	return headerBytes;
+    	
     }
     
     /** Return a view of this page before it was modified

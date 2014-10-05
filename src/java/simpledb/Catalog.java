@@ -130,7 +130,7 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        // some code goes here
+        
     	for (Table table: Catalog_list)
     	{
     		if(table.tableID == tableid){

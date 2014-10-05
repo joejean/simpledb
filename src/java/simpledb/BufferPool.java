@@ -1,7 +1,7 @@
 package simpledb;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,15 +24,18 @@ public class BufferPool {
     /** Default number of pages passed to the constructor. This is used by
     other classes. BufferPool should use the numPages argument to the
     constructor instead. */
-    //the static and final had to be taken off so num_Pages could be assigned 
-    // to DEFAULT_PAGES in the constructor
-    public static int DEFAULT_PAGES = 50;
+   
+    public static final int DEFAULT_PAGES = 50;
     
-    //where it stores it's page
-    //I really wanted to use BoundedFifoBuffer but I barely know java
-    //and all that library packaging and java jargon was too complicated
-    //sooo... yeah
-    public ArrayList<Page> bufferPoolStorage;
+    //Maximum number of pages in this buffer Pool.
+    final int numPages; 
+    
+   
+    
+    //This hash table stores the current pages in memory.
+    //By associating a page to its PageID, it is very easy to retrieve it later
+    final ConcurrentHashMap<PageId, Page> pages; 
+    
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -40,9 +43,10 @@ public class BufferPool {
      * @param numPages maximum number of pages in this buffer pool.
      */
     public BufferPool(int numPages) {
-        // some code goes here
-    	BufferPool.DEFAULT_PAGES = numPages;
-    	this.bufferPoolStorage = new ArrayList<Page>(DEFAULT_PAGES);
+        
+    	this.numPages = numPages;
+    	
+    	this.pages = new ConcurrentHashMap<PageId, Page>();
     }
     
     public static int getPageSize() {
@@ -71,19 +75,25 @@ public class BufferPool {
      */
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
-        // some code goes here
-    	boolean page_found = false;
-    	for (Page page: bufferPoolStorage){
-    		if(page.getId().equals(pid)){
-    			page_found = true;
-    			return page;
-    		}
-    	}
-    	if (page_found == false){
-    		//read page from DbFile using pageId
-    		
-    	}
-        return null;
+        Page page;
+        //Try to retrieve the page from the bufferPool
+        page = pages.get(pid);
+        
+        //If it is not present
+        if (page == null){
+        	
+        	//Get it from the database. getDatabaseFile returns the DbFile that can be used to read the contents
+        	//of the specified table. ReadPage reads the specified page from disk
+        	
+        	page= Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
+        	//And add it to the bufferPool
+        	pages.put(pid, page);
+        }
+        //if the BufferPool is full, i.e its # of pages is > than the maximum allowed numPages throw a DBException for now
+        if(pages.size() >= numPages)
+        	throw new DbException("Insufficient space in buffer pool. Eviction policy not implemented yet");
+    	
+        return page;
     }
 
     /**
